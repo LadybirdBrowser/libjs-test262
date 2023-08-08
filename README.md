@@ -40,15 +40,14 @@ python3 main.py --libjs-test262-runner ./Build/_deps/lagom-build/bin/test262-run
 ## Options
 
 ```text
-usage: main.py [-h] [-j PATH] [-b] [-t PATH] [-p PATTERN] [-c CONCURRENCY] [--timeout TIMEOUT] [--memory-limit MEMORY_LIMIT] [--json] [--per-file PATH] [-s | -v] [-f] [--parse-only] [--ignore IGNORE] [--forward-stderr] [--summary]
+usage: main.py [-h] -j PATH [-t PATH] [-p PATTERN] [-c CONCURRENCY] [--timeout TIMEOUT] [--memory-limit MEMORY_LIMIT] [--json] [--per-file PATH] [-s | -v] [-f] [--parse-only] [--ignore IGNORE] [--forward-stderr] [--summary] [--debug]
 
 Run the test262 ECMAScript test suite with SerenityOS's LibJS
 
-optional arguments:
+options:
   -h, --help            show this help message and exit
   -j PATH, --libjs-test262-runner PATH
-                        path to the 'libjs-test262-runner' binary
-  -b, --use-bytecode    Use the bytecode interpreter to run the tests
+                        path to the 'test262-runner' binary
   -t PATH, --test262-root PATH
                         path to the 'test262' directory
   -p PATTERN, --pattern PATTERN

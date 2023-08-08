@@ -75,7 +75,6 @@ progress_mutex = threading.Lock()
 def run_streaming_script(
     libjs_test262_runner: Path,
     test262_root: Path,
-    use_bytecode: bool,
     extra_runner_options: list[str],
     timeout: int,
     memory_limit: int,
@@ -89,7 +88,6 @@ def run_streaming_script(
 
     command = [
         str(libjs_test262_runner),
-        *(["-b"] if use_bytecode else []),
         *extra_runner_options,
         "--harness-location",
         str((test262_root / "harness").resolve()),
@@ -113,7 +111,6 @@ def run_tests(
     libjs_test262_runner: Path,
     test262_root: Path,
     test_file_paths: list[Path],
-    use_bytecode: bool,
     extra_runner_options: list[str],
     timeout: int,
     memory_limit: int,
@@ -147,7 +144,6 @@ def run_tests(
             process_result: Any = run_streaming_script(
                 libjs_test262_runner,
                 test262_root,
-                use_bytecode,
                 extra_runner_options,
                 timeout,
                 memory_limit,
@@ -258,7 +254,6 @@ class Runner:
         memory_limit: int,
         silent: bool = False,
         verbose: bool = False,
-        use_bytecode: bool = False,
         track_per_file: bool = False,
         fail_only: bool = False,
         extra_runner_options: list[str] | None = None,
@@ -272,7 +267,6 @@ class Runner:
         self.memory_limit = memory_limit
         self.silent = silent
         self.verbose = verbose
-        self.use_bytecode = use_bytecode
         self.track_per_file = track_per_file
         self.fail_only = fail_only
         self.files: list[Path] = []
@@ -400,7 +394,6 @@ class Runner:
                 self.libjs_test262_runner,
                 self.test262_root,
                 files,
-                use_bytecode=self.use_bytecode,
                 extra_runner_options=self.extra_runner_options,
                 timeout=self.timeout,
                 memory_limit=self.memory_limit,
@@ -514,12 +507,6 @@ def main() -> None:
         help="path to the 'test262-runner' binary",
     )
     parser.add_argument(
-        "-b",
-        "--use-bytecode",
-        action="store_true",
-        help="Use the bytecode interpreter to run the tests",
-    )
-    parser.add_argument(
         "-t",
         "--test262-root",
         default="./test262",
@@ -619,7 +606,6 @@ def main() -> None:
         args.memory_limit,
         args.silent,
         args.verbose,
-        args.use_bytecode,
         args.per_file is not None,
         args.fail_only,
         extra_runner_options,

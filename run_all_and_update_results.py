@@ -79,14 +79,7 @@ def main() -> None:
         default=None,
         type=str,
         metavar="PATH",
-        help="output the per-file result of the non-bytecode run to this file",
-    )
-    parser.add_argument(
-        "--per-file-bytecode-output",
-        default=None,
-        type=str,
-        metavar="PATH",
-        help="output the per-file result of the bytecode run to this file",
+        help="output the per-file result to this file",
     )
     args = parser.parse_args()
 
@@ -143,7 +136,7 @@ def main() -> None:
     )
     test_js_results = test_js_output["results"]["tests"]
 
-    print("Running test262 with the AST interpreter...")
+    print("Running test262...")
     libjs_test262_output = json.loads(
         # This is not the way, but I can't be bothered to import this stuff. :^)
         run_command(
@@ -160,23 +153,6 @@ def main() -> None:
     )
     libjs_test262_results = libjs_test262_output["results"]["test"]["results"]
 
-    print("Running test262 with the bytecode interpreter...")
-    libjs_test262_bc_output = json.loads(
-        # This is not the way either, but I can't be bothered to fix the one above and _then_ copy it. :^)
-        run_command(
-            f"python3 {libjs_test262_main_py} "
-            f"--libjs-test262-runner {libjs_test262_runner} "
-            f"--test262 {test262} "
-            "--silent --summary --json --use-bytecode "
-            + (
-                ""
-                if args.per_file_bytecode_output is None
-                else f"--per-file {args.per_file_bytecode_output} "
-            )
-        )
-    )
-    libjs_test262_bc_results = libjs_test262_bc_output["results"]["test"]["results"]
-
     result = {
         "commit_timestamp": commit_timestamp,
         "run_timestamp": run_timestamp,
@@ -187,7 +163,7 @@ def main() -> None:
             "test262-parser-tests": version_test262_parser_tests,
         },
         "tests": {
-            "test262": {
+            "test262-bytecode": {
                 "duration": libjs_test262_output["duration"],
                 "results": {
                     "total": libjs_test262_output["results"]["test"]["count"],
@@ -200,21 +176,6 @@ def main() -> None:
                     "process_error": libjs_test262_results["PROCESS_ERROR"],
                     "runner_exception": libjs_test262_results["RUNNER_EXCEPTION"],
                     "todo_error": libjs_test262_results["TODO_ERROR"],
-                },
-            },
-            "test262-bytecode": {
-                "duration": libjs_test262_bc_output["duration"],
-                "results": {
-                    "total": libjs_test262_bc_output["results"]["test"]["count"],
-                    "passed": libjs_test262_bc_results["PASSED"],
-                    "failed": libjs_test262_bc_results["FAILED"],
-                    "skipped": libjs_test262_bc_results["SKIPPED"],
-                    "metadata_error": libjs_test262_bc_results["METADATA_ERROR"],
-                    "harness_error": libjs_test262_bc_results["HARNESS_ERROR"],
-                    "timeout_error": libjs_test262_bc_results["TIMEOUT_ERROR"],
-                    "process_error": libjs_test262_bc_results["PROCESS_ERROR"],
-                    "runner_exception": libjs_test262_bc_results["RUNNER_EXCEPTION"],
-                    "todo_error": libjs_test262_bc_results["TODO_ERROR"],
                 },
             },
             "test262-parser-tests": {

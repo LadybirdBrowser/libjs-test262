@@ -163,7 +163,7 @@ def main() -> None:
             "test262-parser-tests": version_test262_parser_tests,
         },
         "tests": {
-            "test262-bytecode": {
+            "test262": {
                 "duration": libjs_test262_output["duration"],
                 "results": {
                     "total": libjs_test262_output["results"]["test"]["count"],

@@ -18,23 +18,19 @@ Dependencies are:
 
 ## Usage
 
-To clone test262, clone SerenityOS, build Lagom, and build `libjs-test262-runner`, run:
+To clone test262, clone serenity and build Lagom run:
 
 ```console
 ./setup.sh
 ```
 
-The repositories will only be cloned if they don't exist yet locally, so you
-can use this script for development of the test runner as well.
-
-If `SERENITY_SOURCE_DIR` is set, it will be used instead. However, if the Lagom
-build directory already exists, the script will not touch your build in that
-case, so you'll need to build `libLagom.a` yourself.
+The repositories will only be cloned if they don't exist yet locally.
+If `SERENITY_SOURCE_DIR` is set, it will be used to compile the runner instead of cloning serenity.
 
 Once that's done, run:
 
 ```console
-python3 main.py --libjs-test262-runner ./Build/_deps/lagom-build/bin/test262-runner --test262-root ./test262/
+python3 main.py --libjs-test262-runner ./Build/bin/test262-runner --test262-root ./test262/
 ```
 
 ## Options

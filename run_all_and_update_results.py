@@ -30,13 +30,21 @@ def get_git_commit_timestamp(path: Path) -> int:
 
 
 def find_lagom_executable(test262_path: Path, serenity_path: Path, name: str):
-    executable_path = test262_path / f"Build/_deps/lagom-build/bin/{name}"
-    if not executable_path.exists():
-        executable_path = serenity_path / f"Build/lagom/bin/{name}"
-        if not executable_path.exists():
-            executable_path = serenity_path / f"Build/lagom/Meta/Lagom/bin/{name}"
+    # Build/bin: Local build
+    # serenity_path / Build/lagom/bin: Meta/Lagom source dir
+    # _deps: Local build before 2023-08-13
 
-    return executable_path
+    paths = [
+        test262_path / f"Build/bin/{name}",
+        serenity_path / f"Build/lagom/bin/{name}",
+        test262_path / f"Build/_deps/lagom-build/bin/{name}",
+    ]
+
+    for path in paths:
+        if path.exists():
+            return path
+
+    raise RuntimeError(f"Unable to find {name}")
 
 
 def main() -> None:

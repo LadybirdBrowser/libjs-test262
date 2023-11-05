@@ -157,7 +157,7 @@ def main() -> None:
             f"--libjs-test262-runner {libjs_test262_runner} "
             f"--test262 {test262} "
             "--silent --summary --json "
-            + ("" if args.jit else "--jit ")
+            + ("--jit " if args.jit else "")
             + (
                 ""
                 if args.per_file_output is None

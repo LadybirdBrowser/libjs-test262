@@ -89,6 +89,11 @@ def main() -> None:
         metavar="PATH",
         help="output the per-file result to this file",
     )
+    parser.add_argument(
+        "--jit",
+        action="store_true",
+        help="Enable JIT compilation mode",
+    )
     args = parser.parse_args()
 
     libjs_test262 = Path(__file__).parent
@@ -152,6 +157,7 @@ def main() -> None:
             f"--libjs-test262-runner {libjs_test262_runner} "
             f"--test262 {test262} "
             "--silent --summary --json "
+            + ("" if args.jit else "--jit ")
             + (
                 ""
                 if args.per_file_output is None

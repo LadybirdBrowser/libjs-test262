@@ -79,7 +79,6 @@ def run_streaming_script(
     timeout: int,
     memory_limit: int,
     test_file_paths: list[Path],
-    jit: bool,
 ) -> subprocess.CompletedProcess:
     def limit_memory():
         if platform.system() != "Darwin":
@@ -105,7 +104,6 @@ def run_streaming_script(
         text=True,
         preexec_fn=limit_memory,
         errors="ignore",  # strip invalid utf8 code points instead of throwing (to allow for invalid utf-8 tests)
-        env=({"LIBJS_JIT": "1"} if jit else dict()),
     )
 
 
@@ -118,7 +116,6 @@ def run_tests(
     memory_limit: int,
     on_progress_change: Callable[[int, dict[str, int]], None] | None,
     forward_stderr: Callable[[str], None] | None,
-    jit: bool,
 ) -> list[TestRun]:
     current_test = 0
     results = []
@@ -151,7 +148,6 @@ def run_tests(
                 timeout,
                 memory_limit,
                 test_file_paths[current_test : current_test + BATCH_SIZE],
-                jit,
             )
         except subprocess.CalledProcessError as e:
             process_failed = True
@@ -263,7 +259,6 @@ class Runner:
         extra_runner_options: list[str] | None = None,
         forward_stderr: bool = False,
         summary: bool = False,
-        jit: bool = False,
     ) -> None:
         self.libjs_test262_runner = libjs_test262_runner
         self.test262_root = test262_root
@@ -282,7 +277,6 @@ class Runner:
         self.extra_runner_options = extra_runner_options or []
         self.update_function: Callable[[int], None] | None = None
         self.print_output: Callable[[Optional[Any]], Any] = print
-        self.jit = jit
 
         self.forward_stderr_function: Callable[[str], None] | None
         if forward_stderr:
@@ -405,15 +399,14 @@ class Runner:
                 memory_limit=self.memory_limit,
                 on_progress_change=self.update_function,
                 forward_stderr=self.forward_stderr_function,
-                jit=self.jit,
             )
         except Exception as e:
             return [
                 TestRun(
                     file,
-                    result=TestResult.RUNNER_EXCEPTION
-                    if i == 0
-                    else TestResult.SKIPPED,
+                    result=(
+                        TestResult.RUNNER_EXCEPTION if i == 0 else TestResult.SKIPPED
+                    ),
                     output=traceback.format_exc() if i == 0 else "",
                     exit_code=None,
                     strict_mode=None,
@@ -505,11 +498,6 @@ def main() -> None:
     parser = ArgumentParser(
         description="Run the test262 ECMAScript test suite with SerenityOS's LibJS",
         epilog=", ".join(f"{EMOJIS[result]} = {result.value}" for result in TestResult),
-    )
-    parser.add_argument(
-        "--jit",
-        action="store_true",
-        help="Enable JIT compilation mode",
     )
     parser.add_argument(
         "-j",
@@ -623,7 +611,6 @@ def main() -> None:
         extra_runner_options,
         args.forward_stderr,
         args.summary,
-        args.jit,
     )
     runner.find_tests(args.pattern, args.ignore)
     runner.run()

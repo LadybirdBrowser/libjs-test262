@@ -89,13 +89,6 @@ def main() -> None:
         metavar="PATH",
         help="output the per-file result to this file",
     )
-    parser.add_argument(
-        "--per-file-jit-output",
-        default=None,
-        type=str,
-        metavar="PATH",
-        help="output the per-file JIT result to this file",
-    )
     args = parser.parse_args()
 
     libjs_test262 = Path(__file__).parent
@@ -168,23 +161,6 @@ def main() -> None:
     )
     libjs_test262_results = libjs_test262_output["results"]["test"]["results"]
 
-    print("Running test262 with JIT compiler...")
-    libjs_test262_jit_output = json.loads(
-        # This is not the way, but I can't be bothered to import this stuff. :^)
-        run_command(
-            f"python3 {libjs_test262_main_py} "
-            f"--libjs-test262-runner {libjs_test262_runner} "
-            f"--test262 {test262} "
-            "--silent --summary --json --jit "
-            + (
-                ""
-                if args.per_file_jit_output is None
-                else f"--per-file {args.per_file_jit_output} "
-            )
-        )
-    )
-    libjs_test262_jit_results = libjs_test262_jit_output["results"]["test"]["results"]
-
     result = {
         "commit_timestamp": commit_timestamp,
         "run_timestamp": run_timestamp,
@@ -208,21 +184,6 @@ def main() -> None:
                     "process_error": libjs_test262_results["PROCESS_ERROR"],
                     "runner_exception": libjs_test262_results["RUNNER_EXCEPTION"],
                     "todo_error": libjs_test262_results["TODO_ERROR"],
-                },
-            },
-            "test262-jit": {
-                "duration": libjs_test262_jit_output["duration"],
-                "results": {
-                    "total": libjs_test262_jit_output["results"]["test"]["count"],
-                    "passed": libjs_test262_jit_results["PASSED"],
-                    "failed": libjs_test262_jit_results["FAILED"],
-                    "skipped": libjs_test262_jit_results["SKIPPED"],
-                    "metadata_error": libjs_test262_jit_results["METADATA_ERROR"],
-                    "harness_error": libjs_test262_jit_results["HARNESS_ERROR"],
-                    "timeout_error": libjs_test262_jit_results["TIMEOUT_ERROR"],
-                    "process_error": libjs_test262_jit_results["PROCESS_ERROR"],
-                    "runner_exception": libjs_test262_jit_results["RUNNER_EXCEPTION"],
-                    "todo_error": libjs_test262_jit_results["TODO_ERROR"],
                 },
             },
             "test262-parser-tests": {

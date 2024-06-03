@@ -1,6 +1,6 @@
 # LibJS test262
 
-> Run the [Official ECMAScript Conformance Test Suite](https://github.com/tc39/test262) with [SerenityOS](https://github.com/SerenityOS/serenity)'s [`LibJS`](https://github.com/SerenityOS/serenity/tree/master/Userland/Libraries/LibJS)
+> Run the [Official ECMAScript Conformance Test Suite](https://github.com/tc39/test262) with [Ladybird](https://github.com/LadybirdWebBrowser/ladybird)'s [`LibJS`](https://github.com/LadybirdWebBrowser/ladybird/tree/master/Userland/Libraries/LibJS)
 
 ## Installation
 
@@ -18,14 +18,14 @@ Dependencies are:
 
 ## Usage
 
-To clone test262, clone serenity and build Lagom run:
+To clone test262, clone ladybird and build Lagom run:
 
 ```console
 ./setup.sh
 ```
 
 The repositories will only be cloned if they don't exist yet locally.
-If `SERENITY_SOURCE_DIR` is set, it will be used to compile the runner instead of cloning serenity.
+If `SERENITY_SOURCE_DIR` is set, it will be used to compile the runner instead of cloning ladybird.
 
 Once that's done, run:
 
@@ -38,7 +38,7 @@ python3 main.py --libjs-test262-runner ./Build/bin/test262-runner --test262-root
 ```text
 usage: main.py [-h] -j PATH [-t PATH] [-p PATTERN] [-c CONCURRENCY] [--timeout TIMEOUT] [--memory-limit MEMORY_LIMIT] [--json] [--per-file PATH] [-s | -v] [-f] [--parse-only] [--ignore IGNORE] [--forward-stderr] [--summary] [--debug]
 
-Run the test262 ECMAScript test suite with SerenityOS's LibJS
+Run the test262 ECMAScript test suite with Ladybird's LibJS
 
 options:
   -h, --help            show this help message and exit

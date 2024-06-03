@@ -2,9 +2,9 @@
 #
 # SPDX-License-Identifier: MIT
 
-# Fetch serenity, so that we can build Lagom from it
+# Fetch ladybird, so that we can build Lagom from it
 FetchContent_Declare(lagom
-    GIT_REPOSITORY https://github.com/SerenityOS/serenity.git
+    GIT_REPOSITORY https://github.com/LadybirdWebBrowser/ladybird.git
     GIT_TAG origin/master
     GIT_SHALLOW TRUE
     SOURCE_DIR serenity

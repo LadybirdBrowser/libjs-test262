@@ -496,7 +496,7 @@ class Runner:
 
 def main() -> None:
     parser = ArgumentParser(
-        description="Run the test262 ECMAScript test suite with SerenityOS's LibJS",
+        description="Run the test262 ECMAScript test suite with Ladybird's LibJS",
         epilog=", ".join(f"{EMOJIS[result]} = {result.value}" for result in TestResult),
     )
     parser.add_argument(

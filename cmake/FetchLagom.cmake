@@ -11,9 +11,9 @@ FetchContent_Declare(lagom
 )
 
 # Allow developers to skip download/update steps with local checkout
-if (SERENITY_SOURCE_DIR)
-    set(FETCHCONTENT_SOURCE_DIR_LAGOM ${SERENITY_SOURCE_DIR} CACHE PATH "Developer's pre-existing serenity source directory" FORCE)
-    message(STATUS "Using pre-existing SERENITY_SOURCE_DIR: ${SERENITY_SOURCE_DIR}")
+if (LADYBIRD_SOURCE_DIR)
+    set(FETCHCONTENT_SOURCE_DIR_LAGOM ${LADYBIRD_SOURCE_DIR} CACHE PATH "Developer's pre-existing serenity source directory" FORCE)
+    message(STATUS "Using pre-existing LADYBIRD_SOURCE_DIR: ${LADYBIRD_SOURCE_DIR}")
 endif()
 
 # Can't use FetchContent_MakeAvailable b/c we want to use the Lagom build, not the main build

@@ -25,7 +25,7 @@ To clone test262, clone ladybird and build Lagom run:
 ```
 
 The repositories will only be cloned if they don't exist yet locally.
-If `SERENITY_SOURCE_DIR` is set, it will be used to compile the runner instead of cloning ladybird.
+If `LADYBIRD_SOURCE_DIR` is set, it will be used to compile the runner instead of cloning ladybird.
 
 Once that's done, run:
 

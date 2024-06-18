@@ -14,7 +14,7 @@ fi
 mkdir -p "${LIBJS_TEST262_BUILD_DIR}"
 pushd "${LIBJS_TEST262_BUILD_DIR}"
     log libjs-test262-runner "Running CMake..."
-    cmake -GNinja .. -DSERENITY_SOURCE_DIR="${SERENITY_SOURCE_DIR}"
+    cmake -GNinja .. -DLADYBIRD_SOURCE_DIR="${LADYBIRD_SOURCE_DIR}"
 
     log libjs-test262-runner "Building..."
     cmake --build . --target test262-runner test-js

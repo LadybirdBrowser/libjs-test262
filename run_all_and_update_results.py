@@ -139,7 +139,7 @@ def main() -> None:
     test_js_output = json.loads(
         run_command(
             f"{serenity_test_js} --test262-parser-tests {test262_parser_tests} --json",
-            env={"SERENITY_SOURCE_DIR": str(serenity)},
+            env={"LADYBIRD_SOURCE_DIR": str(serenity)},
         )
     )
     test_js_results = test_js_output["results"]["tests"]

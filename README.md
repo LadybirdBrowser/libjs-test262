@@ -1,14 +1,22 @@
 # LibJS test262
 
-> Run the [Official ECMAScript Conformance Test Suite](https://github.com/tc39/test262) with [Ladybird](https://github.com/LadybirdWebBrowser/ladybird)'s [`LibJS`](https://github.com/LadybirdWebBrowser/ladybird/tree/master/Userland/Libraries/LibJS)
+Run the [Official ECMAScript Conformance Test Suite](https://github.com/tc39/test262) with [Ladybird](https://github.com/LadybirdWebBrowser/ladybird)'s [`LibJS`](https://github.com/LadybirdWebBrowser/ladybird/tree/master/Userland/Libraries/LibJS)
 
 ## Installation
 
-Install `git`, `cmake`, `ninja`, `gcc`/`clang` and `python3` (3.9+).
+First, clone and build [the Ladybird project](https://github.com/LadybirdBrowser/ladybird/blob/master/Documentation/BuildInstructionsLadybird.md).
+To run test262, only the `test262-runner` Ladybird target needs to be built. From the Ladybird checkout, run:
 
-To install the script's dependencies, run:
+```bash
+./Meta/ladybird.sh build test262-runner
+```
 
-```console
+Then, in the libjs-test262 project, set up a virtual environment (optional) and install the script's dependencies:
+
+```bash
+virtualenv .venv
+source .venv/bin/activate
+
 pip3 install -r requirements.txt
 ```
 
@@ -16,21 +24,19 @@ Dependencies are:
 
 - `tqdm` for displaying a progress bar
 
-## Usage
+Finally, clone or sync test262 itself:
 
-To clone test262, clone ladybird and build Lagom run:
-
-```console
-./setup.sh
+```bash
+./sync-test262.sh
 ```
 
-The repositories will only be cloned if they don't exist yet locally.
-If `LADYBIRD_SOURCE_DIR` is set, it will be used to compile the runner instead of cloning ladybird.
+## Usage
 
-Once that's done, run:
+In the below command, `LADYBIRD_SOURCE_DIR` should point to the Ladybird checkout. The exact path to `test262-runner`
+may vary depending on any extra options that were provided to `ladybird.sh` above.
 
-```console
-python3 main.py --libjs-test262-runner ./Build/bin/test262-runner --test262-root ./test262/
+```bash
+./main.py --libjs-test262-runner "${LADYBIRD_SOURCE_DIR}/Build/ladybird/bin/test262-runner" --test262-root ./test262
 ```
 
 ## Options
@@ -65,9 +71,8 @@ options:
   --debug               enable debug logging of the runner
 ```
 
-## Current status
+## Results
 
-Most of the tests run to completion and yield correct results. Few of the test
-harness files do not parse yet or generate runtime errors, those are listed in
-the results under a separate category, as are tests that fail to parse their
-metadata, time out, or crash the engine (todo assertion failures, mostly).
+Test results are updated for every commit to the Ladybird repository. They may be viewed here:
+
+https://ladybirdbrowser.github.io/libjs-website/test262/

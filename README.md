@@ -36,7 +36,7 @@ In the below command, `LADYBIRD_SOURCE_DIR` should point to the Ladybird checkou
 may vary depending on any extra options that were provided to `ladybird.sh` above.
 
 ```bash
-./main.py --libjs-test262-runner "${LADYBIRD_SOURCE_DIR}/Build/ladybird/bin/test262-runner" --test262-root ./test262
+./main.py --libjs-test262-runner "${LADYBIRD_SOURCE_DIR}/Build/release/bin/test262-runner" --test262-root ./test262
 ```
 
 ## Options

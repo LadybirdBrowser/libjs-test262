@@ -8,7 +8,7 @@ First, clone and build [the Ladybird project](https://github.com/LadybirdBrowser
 To run test262, only the `test262-runner` Ladybird target needs to be built. From the Ladybird checkout, run:
 
 ```bash
-./Meta/ladybird.sh build test262-runner
+./Meta/ladybird.py build test262-runner
 ```
 
 Then, in the libjs-test262 project, set up a virtual environment (optional) and install the script's dependencies:
@@ -33,7 +33,7 @@ Finally, clone or sync test262 itself:
 ## Usage
 
 In the below command, `LADYBIRD_SOURCE_DIR` should point to the Ladybird checkout. The exact path to `test262-runner`
-may vary depending on any extra options that were provided to `ladybird.sh` above.
+may vary depending on any extra options that were provided to `ladybird.py` above.
 
 ```bash
 ./main.py --libjs-test262-runner "${LADYBIRD_SOURCE_DIR}/Build/release/bin/test262-runner" --test262-root ./test262

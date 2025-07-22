@@ -32,8 +32,14 @@ Finally, clone or sync test262 itself:
 
 ## Usage
 
-In the below command, `LADYBIRD_SOURCE_DIR` should point to the Ladybird checkout. The exact path to `test262-runner`
-may vary depending on any extra options that were provided to `ladybird.py` above.
+If you've built Ladybird with its default configuration, and you have set `LADYBIRD_SOURCE_DIR` to point at your Ladybird
+checkout, you can run the following command to run all tests:
+
+```bash
+./main.py
+```
+
+You may also override the path to the test262-runner and the path to the test262 tests:
 
 ```bash
 ./main.py --libjs-test262-runner "${LADYBIRD_SOURCE_DIR}/Build/release/bin/test262-runner" --test262-root ./test262

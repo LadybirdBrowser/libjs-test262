@@ -494,7 +494,23 @@ class Runner:
         self.log(f"Finished running tests in {self.duration}.")
 
 
+def default_test262_runner_path() -> Path | None:
+    ladybird_source_dir = os.environ.get("LADYBIRD_SOURCE_DIR")
+
+    if ladybird_source_dir:
+        default_test262_runner = (
+            Path(ladybird_source_dir) / "Build" / "release" / "bin" / "test262-runner"
+        )
+
+        if default_test262_runner.exists():
+            return default_test262_runner
+
+    return None
+
+
 def main() -> None:
+    default_test262_runner = default_test262_runner_path()
+
     parser = ArgumentParser(
         description="Run the test262 ECMAScript test suite with Ladybird's LibJS",
         epilog=", ".join(f"{EMOJIS[result]} = {result.value}" for result in TestResult),
@@ -502,7 +518,8 @@ def main() -> None:
     parser.add_argument(
         "-j",
         "--libjs-test262-runner",
-        required=True,
+        required=default_test262_runner is None,
+        default=str(default_test262_runner) if default_test262_runner else None,
         metavar="PATH",
         help="path to the 'test262-runner' binary",
     )

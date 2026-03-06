@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+
 # Copyright (c) 2020-2021, Linus Groh <linusg@serenityos.org>
 # Copyright (c) 2021, Marcin Gasperowicz <xnooga@gmail.com>
 # Copyright (c) 2021, Idan Horowitz <idan.horowitz@serenityos.org>
@@ -21,12 +22,15 @@ import subprocess
 import sys
 import threading
 import traceback
+
 from argparse import ArgumentParser
-from dataclasses import dataclass
 from collections import Counter
+from dataclasses import dataclass
 from enum import Enum
 from pathlib import Path
-from typing import Any, Callable, Optional
+from typing import Any
+from typing import Callable
+from typing import Optional
 
 from tqdm import tqdm
 
@@ -82,9 +86,7 @@ def run_streaming_script(
 ) -> subprocess.CompletedProcess:
     def limit_memory():
         if platform.system() != "Darwin":
-            resource.setrlimit(
-                resource.RLIMIT_AS, (memory_limit * 1024 * 1024, resource.RLIM_INFINITY)
-            )
+            resource.setrlimit(resource.RLIMIT_AS, (memory_limit * 1024 * 1024, resource.RLIM_INFINITY))
 
     command = [
         str(libjs_test262_runner),
@@ -127,11 +129,7 @@ def run_tests(
         exit_code: int = 0,
         strict_mode: bool = False,
     ) -> None:
-        iteration_results.append(
-            TestRun(
-                test_file_paths[current_test], result, output, exit_code, strict_mode
-            )
-        )
+        iteration_results.append(TestRun(test_file_paths[current_test], result, output, exit_code, strict_mode))
 
     new_results = []
     while current_test < len(test_file_paths):
@@ -153,9 +151,7 @@ def run_tests(
             process_failed = True
             process_result = e
 
-        test_results = [
-            part.strip() for part in process_result.stdout.strip().split("\0")
-        ]
+        test_results = [part.strip() for part in process_result.stdout.strip().split("\0")]
         have_stopping_result = False
 
         while test_results:
@@ -167,7 +163,7 @@ def run_tests(
             try:
                 test_result = json.loads(test_result_string, strict=False)
             except json.decoder.JSONDecodeError:
-                raise Exception(f"Could not parse JSON from '{test_result_string}'")
+                raise Exception(f"Could not parse JSON from '{test_result_string}'") from None
 
             file_name = Path(test_result["test"])
 
@@ -229,10 +225,7 @@ def run_tests(
             )
             current_test += 1
         elif forward_stderr is not None and process_result.stderr.strip() != "":
-            forward_stderr(
-                "Process did not fail but still there is stderr output:\n"
-                + process_result.stderr
-            )
+            forward_stderr("Process did not fail but still there is stderr output:\n" + process_result.stderr)
 
         if on_progress_change is not None:
             on_progress_change(
@@ -281,13 +274,9 @@ class Runner:
         self.forward_stderr_function: Callable[[str], None] | None
         if forward_stderr:
             if self.silent:
-                self.forward_stderr_function = lambda message: print(
-                    message, file=sys.stderr
-                )
+                self.forward_stderr_function = lambda message: print(message, file=sys.stderr)
             else:
-                self.forward_stderr_function = lambda message: tqdm.write(
-                    message, file=sys.stderr
-                )
+                self.forward_stderr_function = lambda message: tqdm.write(message, file=sys.stderr)
         else:
             self.forward_stderr_function = None
 
@@ -301,9 +290,7 @@ class Runner:
         if Path(pattern).resolve().is_file():
             self.files = [Path(pattern).resolve()]
         else:
-            ignored_files = set(
-                glob.iglob(str(self.test262_root / ignore), recursive=True)
-            )
+            ignored_files = set(glob.iglob(str(self.test262_root / ignore), recursive=True))
             for path in glob.iglob(str(self.test262_root / pattern), recursive=True):
                 found_path = Path(path)
                 if (
@@ -340,7 +327,7 @@ class Runner:
             directory = file.relative_to(self.test262_root).parent
             counter = self.directory_result_map
             for segment in directory.parts:
-                if not segment in counter:
+                if segment not in counter:
                     counter[segment] = {"count": 1, "results": {}, "children": {}}
                     for result in TestResult:
                         counter[segment]["results"][result] = 0
@@ -375,9 +362,7 @@ class Runner:
             passed = tree["results"][TestResult.PASSED]
             percentage = (passed / count) * 100
             pad = " " * (80 - len(path))
-            self.print_output(
-                f"{path}{pad}{passed:>5}/{count:<5} ({percentage:6.2f}%) {results} "
-            )
+            self.print_output(f"{path}{pad}{passed:>5}/{count:<5} ({percentage:6.2f}%) {results} ")
             if passed > 0:
                 for k, v in tree["children"].items():
                     print_tree(v, path + "/" + k, level + 1)
@@ -400,13 +385,11 @@ class Runner:
                 on_progress_change=self.update_function,
                 forward_stderr=self.forward_stderr_function,
             )
-        except Exception as e:
+        except Exception:
             return [
                 TestRun(
                     file,
-                    result=(
-                        TestResult.RUNNER_EXCEPTION if i == 0 else TestResult.SKIPPED
-                    ),
+                    result=(TestResult.RUNNER_EXCEPTION if i == 0 else TestResult.SKIPPED),
                     output=traceback.format_exc() if i == 0 else "",
                     exit_code=None,
                     strict_mode=None,
@@ -432,11 +415,10 @@ class Runner:
             work_lists[index % amount_of_work_lists].append(test_path)
 
         if not self.silent:
-            progressbar = tqdm(
-                total=self.total_count, mininterval=1, unit="tests", smoothing=0.1
-            )
+            progressbar = tqdm(total=self.total_count, mininterval=1, unit="tests", smoothing=0.1)
+            total_stats = Counter()
 
-            def update_progress(value, new_results, total_stats=Counter()):
+            def update_progress(value, new_results):
                 progress_mutex.acquire()
                 total_stats.update(new_results)
                 try:
@@ -455,18 +437,13 @@ class Runner:
         start = datetime.datetime.now()
 
         with concurrent.futures.ThreadPoolExecutor(max_workers=workers) as executor:
-            futures = [
-                executor.submit(self.process_list, file_list)
-                for file_list in work_lists
-            ]
+            futures = [executor.submit(self.process_list, file_list) for file_list in work_lists]
 
             for future in concurrent.futures.as_completed(futures):
                 test_runs = future.result()
                 for test_run in test_runs:
                     self.count_result(test_run)
-                    if self.verbose or (
-                        self.fail_only and test_run.result not in NON_FAIL_RESULTS
-                    ):
+                    if self.verbose or (self.fail_only and test_run.result not in NON_FAIL_RESULTS):
                         self.print_output(
                             f"{EMOJIS[test_run.result]} {test_run.file}"
                             f"{' (strict mode)' if test_run.strict_mode else ''}"
@@ -480,9 +457,7 @@ class Runner:
                             signalnum = test_run.exit_code * -1
                             if not test_run.output:
                                 self.print_output("")
-                                self.print_output(
-                                    f"{signal.strsignal(signalnum)}: {signalnum}"
-                                )
+                                self.print_output(f"{signal.strsignal(signalnum)}: {signalnum}")
                                 self.print_output("")
 
         if not self.silent:
@@ -498,9 +473,7 @@ def default_test262_runner_path() -> Path | None:
     ladybird_source_dir = os.environ.get("LADYBIRD_SOURCE_DIR")
 
     if ladybird_source_dir:
-        default_test262_runner = (
-            Path(ladybird_source_dir) / "Build" / "release" / "bin" / "test262-runner"
-        )
+        default_test262_runner = Path(ladybird_source_dir) / "Build" / "release" / "bin" / "test262-runner"
 
         if default_test262_runner.exists():
             return default_test262_runner
@@ -555,9 +528,7 @@ def main() -> None:
         type=int,
         help="memory limit for each test run in megabytes (defaults to 512)",
     )
-    parser.add_argument(
-        "--json", action="store_true", help="print the test results as JSON"
-    )
+    parser.add_argument("--json", action="store_true", help="print the test results as JSON")
     parser.add_argument(
         "--per-file",
         default=None,
@@ -572,13 +543,9 @@ def main() -> None:
         action="store_true",
         help="don't print any progress information",
     )
-    logging_group.add_argument(
-        "-v", "--verbose", action="store_true", help="print output of test runs"
-    )
+    logging_group.add_argument("-v", "--verbose", action="store_true", help="print output of test runs")
 
-    parser.add_argument(
-        "-f", "--fail-only", action="store_true", help="only show failed tests"
-    )
+    parser.add_argument("-f", "--fail-only", action="store_true", help="only show failed tests")
     parser.add_argument(
         "--parse-only",
         action="store_true",

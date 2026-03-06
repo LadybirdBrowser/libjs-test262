@@ -10,14 +10,13 @@ import shlex
 import subprocess
 import sys
 import time
+
 from argparse import ArgumentParser
 from pathlib import Path
 
 
 def run_command(command: str, **kwargs) -> str:
-    process = subprocess.run(
-        shlex.split(command), stdout=subprocess.PIPE, text=True, **kwargs
-    )
+    process = subprocess.run(shlex.split(command), stdout=subprocess.PIPE, text=True, **kwargs)
     return process.stdout.strip()
 
 
@@ -53,10 +52,7 @@ def main() -> None:
     # the result would be incomplete anyway.
 
     parser = ArgumentParser(
-        description=(
-            "Run the test262 and test262-parser-tests with "
-            "LibJS and update the results JSON file"
-        )
+        description=("Run the test262 and test262-parser-tests with LibJS and update the results JSON file")
     )
     parser.add_argument(
         "--serenity",
@@ -113,9 +109,7 @@ def main() -> None:
 
     serenity_test_js = find_lagom_executable(libjs_test262, serenity, "test-js")
 
-    libjs_test262_runner = find_lagom_executable(
-        libjs_test262, serenity, "test262-runner"
-    )
+    libjs_test262_runner = find_lagom_executable(libjs_test262, serenity, "test262-runner")
     libjs_test262_main_py = libjs_test262 / "main.py"
 
     version_serenity = get_git_revision(serenity)
@@ -123,11 +117,7 @@ def main() -> None:
     version_test262 = get_git_revision(test262)
     version_test262_parser_tests = get_git_revision(test262_parser_tests)
 
-    result_for_current_revision = (
-        result
-        for result in results
-        if result["versions"]["serenity"] == version_serenity
-    )
+    result_for_current_revision = (r for r in results if r["versions"]["serenity"] == version_serenity)
     if next(result_for_current_revision, None):
         print(
             f"Result for revision {version_serenity[:7]} already exists, "
@@ -152,11 +142,7 @@ def main() -> None:
             f"--libjs-test262-runner {libjs_test262_runner} "
             f"--test262 {test262} "
             "--silent --summary --json "
-            + (
-                ""
-                if args.per_file_output is None
-                else f"--per-file {args.per_file_output} "
-            )
+            + ("" if args.per_file_output is None else f"--per-file {args.per_file_output} ")
         )
     )
     libjs_test262_results = libjs_test262_output["results"]["test"]["results"]

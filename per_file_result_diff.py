@@ -1,27 +1,25 @@
 #!/usr/bin/env python3
+
 # Copyright (c) 2021, Matthew Olsson <mattco@serenityos.org>
 #
 # SPDX-License-Identifier: MIT
 
 import json
+
 from argparse import ArgumentParser
 from pathlib import Path
-from main import TestResult, EMOJIS
+
+from main import EMOJIS
+from main import TestResult
 
 
 class ResultParser:
-    def __init__(
-        self, old_path: Path, new_path: Path, regressions: bool, intersection_only: bool
-    ) -> None:
+    def __init__(self, old_path: Path, new_path: Path, regressions: bool, intersection_only: bool) -> None:
         old_results = json.loads(old_path.read_text())
         new_results = json.loads(new_path.read_text())
 
-        self.duration_delta = float(new_results["duration"]) - float(
-            old_results["duration"]
-        )
-        self.old_results: dict[str, str] = {
-            k: v for k, v in sorted(old_results["results"].items())
-        }
+        self.duration_delta = float(new_results["duration"]) - float(old_results["duration"])
+        self.old_results: dict[str, str] = {k: v for k, v in sorted(old_results["results"].items())}
         self.new_results: dict[str, str] = new_results["results"]
         self.regressions = regressions
         self.intersection_only = intersection_only
@@ -147,18 +145,14 @@ class ResultParser:
             for path, result in self.diff_tests.items():
                 old_emoji = EMOJIS[result["old_result"]]
                 new_emoji = EMOJIS[result["new_result"]]
-                print(
-                    f"    {path:{self.longest_path_length}s} {old_emoji} -> {new_emoji}"
-                )
+                print(f"    {path:{self.longest_path_length}s} {old_emoji} -> {new_emoji}")
 
     def print_regressions(self) -> None:
         for path, result in self.diff_tests.items():
             if result["old_result"] == "PASSED":
                 old_emoji = EMOJIS[TestResult.PASSED]
                 new_emoji = EMOJIS[result["new_result"]]
-                print(
-                    f"    {path:{self.longest_path_length}s} {old_emoji} -> {new_emoji}"
-                )
+                print(f"    {path:{self.longest_path_length}s} {old_emoji} -> {new_emoji}")
 
     def print_results(self) -> None:
         if self.regressions:
@@ -169,12 +163,8 @@ class ResultParser:
 
 def main() -> None:
     parser = ArgumentParser(description="Compare per-file test262 results")
-    parser.add_argument(
-        "-o", "--old", required=True, metavar="PATH", help="the path to the old results"
-    )
-    parser.add_argument(
-        "-n", "--new", required=True, metavar="PATH", help="the path to the new results"
-    )
+    parser.add_argument("-o", "--old", required=True, metavar="PATH", help="the path to the old results")
+    parser.add_argument("-n", "--new", required=True, metavar="PATH", help="the path to the new results")
     parser.add_argument(
         "-r",
         "--regressions",
@@ -189,9 +179,7 @@ def main() -> None:
     )
     args = parser.parse_args()
 
-    ResultParser(
-        Path(args.old), Path(args.new), args.regressions, args.intersection_only
-    ).print_results()
+    ResultParser(Path(args.old), Path(args.new), args.regressions, args.intersection_only).print_results()
 
 
 if __name__ == "__main__":

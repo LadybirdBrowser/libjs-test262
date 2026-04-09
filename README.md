@@ -1,6 +1,6 @@
 # LibJS test262
 
-Run the [Official ECMAScript Conformance Test Suite](https://github.com/tc39/test262) with [Ladybird](https://github.com/LadybirdWebBrowser/ladybird)'s [`LibJS`](https://github.com/LadybirdWebBrowser/ladybird/tree/master/Userland/Libraries/LibJS)
+Run the [Official ECMAScript Conformance Test Suite](https://github.com/tc39/test262) with [Ladybird](https://github.com/LadybirdWebBrowser/ladybird)'s [`LibJS`](https://github.com/LadybirdWebBrowser/ladybird/tree/master/Libraries/LibJS)
 
 ## Installation
 

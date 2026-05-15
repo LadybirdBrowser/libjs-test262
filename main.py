@@ -524,9 +524,9 @@ def main() -> None:
     )
     parser.add_argument(
         "--memory-limit",
-        default=512,
+        default=1024,
         type=int,
-        help="memory limit for each test run in megabytes (defaults to 512)",
+        help="virtual memory limit for each test run in megabytes (defaults to 1024)",
     )
     parser.add_argument("--json", action="store_true", help="print the test results as JSON")
     parser.add_argument(

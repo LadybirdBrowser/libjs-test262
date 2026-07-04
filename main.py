@@ -85,7 +85,7 @@ def run_streaming_script(
     test_file_paths: list[Path],
 ) -> subprocess.CompletedProcess:
     def limit_memory():
-        if platform.system() != "Darwin":
+        if memory_limit > 0 and platform.system() != "Darwin":
             resource.setrlimit(resource.RLIMIT_AS, (memory_limit * 1024 * 1024, resource.RLIM_INFINITY))
 
     command = [
@@ -104,7 +104,7 @@ def run_streaming_script(
         stderr=subprocess.PIPE,
         check=True,
         text=True,
-        preexec_fn=limit_memory,
+        preexec_fn=limit_memory if memory_limit > 0 else None,
         errors="ignore",  # strip invalid utf8 code points instead of throwing (to allow for invalid utf-8 tests)
     )
 
@@ -524,9 +524,9 @@ def main() -> None:
     )
     parser.add_argument(
         "--memory-limit",
-        default=1024,
+        default=0,
         type=int,
-        help="virtual memory limit for each test run in megabytes (defaults to 1024)",
+        help="virtual memory limit for each test run in megabytes (defaults to unlimited)",
     )
     parser.add_argument("--json", action="store_true", help="print the test results as JSON")
     parser.add_argument(

@@ -25,12 +25,11 @@ import traceback
 
 from argparse import ArgumentParser
 from collections import Counter
+from collections.abc import Callable
 from dataclasses import dataclass
 from enum import Enum
 from pathlib import Path
 from typing import Any
-from typing import Callable
-from typing import Optional
 
 from tqdm import tqdm
 
@@ -100,8 +99,7 @@ def run_streaming_script(
     return subprocess.run(
         command,
         input="\n".join(str(path) for path in test_file_paths),
-        stdout=subprocess.PIPE,
-        stderr=subprocess.PIPE,
+        capture_output=True,
         check=True,
         text=True,
         preexec_fn=limit_memory if memory_limit > 0 else None,
@@ -163,12 +161,12 @@ def run_tests(
             try:
                 test_result = json.loads(test_result_string, strict=False)
             except json.decoder.JSONDecodeError:
-                raise Exception(f"Could not parse JSON from '{test_result_string}'") from None
+                raise RuntimeError(f"Could not parse JSON from '{test_result_string}'") from None
 
             file_name = Path(test_result["test"])
 
             if file_name != test_file_paths[current_test]:
-                raise Exception(
+                raise RuntimeError(
                     f"Unexpected result from test {file_name} but expected result from {test_file_paths[current_test]}"
                 )
 
@@ -194,7 +192,7 @@ def run_tests(
             elif result == "todo_error":
                 test_result_state = TestResult.TODO_ERROR
             elif result != "failed":
-                raise Exception(f"Unknown error code: {result} from {test_result}")
+                raise RuntimeError(f"Unknown error code: {result} from {test_result}")
 
             if strict_output := test_result.get("strict_output"):
                 output = strict_output
@@ -269,7 +267,7 @@ class Runner:
         self.duration = datetime.timedelta()
         self.extra_runner_options = extra_runner_options or []
         self.update_function: Callable[[int], None] | None = None
-        self.print_output: Callable[[Optional[Any]], Any] = print
+        self.print_output: Callable[[Any | None], Any] = print
 
         self.forward_stderr_function: Callable[[str], None] | None
         if forward_stderr:
@@ -385,7 +383,7 @@ class Runner:
                 on_progress_change=self.update_function,
                 forward_stderr=self.forward_stderr_function,
             )
-        except Exception:
+        except Exception:  # noqa: BLE001 - Report unexpected runner errors as test results.
             return [
                 TestRun(
                     file,

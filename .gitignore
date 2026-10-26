@@ -144,3 +144,5 @@ Build/
 
 # PyCharm
 .idea/
+
+*.json

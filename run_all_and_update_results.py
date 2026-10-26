@@ -16,7 +16,7 @@ from pathlib import Path
 
 
 def run_command(command: str, **kwargs) -> str:
-    process = subprocess.run(shlex.split(command), stdout=subprocess.PIPE, text=True, **kwargs)
+    process = subprocess.run(shlex.split(command), stdout=subprocess.PIPE, check=False, text=True, **kwargs)
     return process.stdout.strip()
 
 

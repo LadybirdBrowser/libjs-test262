@@ -1,5 +1,6 @@
 [tool.ruff]
 line-length = 120
+target-version = "py39"
 
 [tool.ruff.lint]
 # https://docs.astral.sh/ruff/rules/
@@ -11,3 +12,12 @@ extend-select = [
 [tool.ruff.lint.isort]
 force-single-line = true
 lines-between-types = 1
+
+[tool.pyright]
+pythonVersion = "3.9"
+exclude = [
+    "**/node_modules",
+    "**/__pycache__",
+    "**/.*",
+    "**/lit.cfg.py",
+]

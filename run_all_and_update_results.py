@@ -20,6 +20,27 @@ def run_command(command: str, **kwargs) -> str:
     return process.stdout.strip()
 
 
+def run_json_command(command: str, **kwargs):
+    process = subprocess.run(shlex.split(command), capture_output=True, check=False, text=True, **kwargs)
+    if process.stderr:
+        sys.stderr.write(process.stderr)
+    print(
+        f"Command {command!r} exited with {process.returncode}; "
+        f"stdout: {len(process.stdout)} characters; stderr: {len(process.stderr)} characters",
+        file=sys.stderr,
+        flush=True,
+    )
+    try:
+        return json.loads(process.stdout.strip())
+    except json.JSONDecodeError as error:
+        raise RuntimeError(
+            f"Command did not produce valid JSON: {command!r}\n"
+            f"Return code: {process.returncode}\n"
+            f"stdout ({len(process.stdout)} characters):\n{process.stdout}\n"
+            f"stderr ({len(process.stderr)} characters):\n{process.stderr}"
+        ) from error
+
+
 def get_git_revision(path: Path) -> str:
     return run_command(f"git --git-dir {path / '.git'} rev-parse HEAD")
 
@@ -126,24 +147,19 @@ def main() -> None:
         sys.exit(1)
 
     print("Running test262-parser-tests...")
-    test_js_output = json.loads(
-        run_command(
-            f"{serenity_test_js} --test262-parser-tests {test262_parser_tests} --json",
-            env={"LADYBIRD_SOURCE_DIR": str(serenity)},
-        )
+    test_js_output = run_json_command(
+        f"{serenity_test_js} --test262-parser-tests {test262_parser_tests} --json",
+        env={"LADYBIRD_SOURCE_DIR": str(serenity)},
     )
     test_js_results = test_js_output["results"]["tests"]
 
     print("Running test262...")
-    libjs_test262_output = json.loads(
-        # This is not the way, but I can't be bothered to import this stuff. :^)
-        run_command(
-            f"python3 {libjs_test262_main_py} "
-            f"--libjs-test262-runner {libjs_test262_runner} "
-            f"--test262 {test262} "
-            "--silent --summary --json "
-            + ("" if args.per_file_output is None else f"--per-file {args.per_file_output} ")
-        )
+    # This is not the way, but I can't be bothered to import this stuff. :^)
+    libjs_test262_output = run_json_command(
+        f"python3 {libjs_test262_main_py} "
+        f"--libjs-test262-runner {libjs_test262_runner} "
+        f"--test262 {test262} "
+        "--silent --summary --json " + ("" if args.per_file_output is None else f"--per-file {args.per_file_output} ")
     )
     libjs_test262_results = libjs_test262_output["results"]["test"]["results"]
 
